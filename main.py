@@ -27,6 +27,15 @@ if "reset_flag" not in st.session_state:
 
 a, b = st.columns(2)
 with a:
+    timer_status_map = {
+        "studying": "Studying",
+        "short_break": "Short Break",
+        "long_break": "Long Break",
+    }
+    timer_status = timer_status_map.get(st.session_state["timer_status"])
+    if timer_status:
+        st.metric("Status", timer_status, border=True)
+with b:
     timer_ph = st.empty()
 
 if st.session_state["timer_status"] == "reset":
