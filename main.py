@@ -4,11 +4,17 @@ from backend.timer import remaining
 st.set_page_config(page_title="FocusTutor")
 st.title("FocusTutor")
 
+# For testing purpose
+# if "count_for_long_break" not in st.session_state:
+#     st.session_state.count_for_long_break = 0
+# st.markdown(f"{st.session_state.count_for_long_break}")
+
 st.sidebar.markdown("# Settings")
 st.sidebar.slider("Study (min)", key="study_time", value= 25, min_value=1, max_value=120)
 st.sidebar.slider("Short Break (min)", key="short_break_time", value=5, min_value=1, max_value=15)
 st.sidebar.slider("Long Break (min)", key="long_break_time", value=15, min_value=1, max_value=30)
-st.sidebar.number_input("Long Break Interval", key="long_break_interval", value=4, min_value=0, max_value=100)
+st.sidebar.slider("Long Break Interval", key="long_break_interval", value=4, min_value=0, max_value=10)
+st.sidebar.write("0 long breaks interval means no long breaks.")
 
 if "timer_status" not in st.session_state:
     st.session_state["timer_status"] = "reset"
