@@ -88,6 +88,12 @@ elif st.session_state["timer_status"] == "long_break":
     with timer_ph:
         remaining(st.session_state.long_break_time)
 
+# TODO: Implement matplotlib chart here
+
+if st.button("Start EEG Detection", key="start_eeg", use_container_width=True):
+    print("Start EEG Detection")
+    # TODO: Implement EEG detection logic here
+
 st.sidebar.markdown("""
 # Information
 You'll need a [Muse 2](https://choosemuse.com/products/muse-2) or [Muse S](https://choosemuse.com/products/muse-s-athena), plus [Petal Metrics](https://petal.tech/downloads) to run this app.
