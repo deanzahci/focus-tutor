@@ -5,7 +5,9 @@ from backend.cookie import set_session_state, set_cookies
 st.set_page_config(page_title="FocusTutor")
 st.title("FocusTutor")
 
-set_session_state()
+if "init" not in st.session_state:
+    set_session_state()
+    st.session_state.init = ""
 
 # For testing purpose
 # if "count_for_long_break" not in st.session_state:

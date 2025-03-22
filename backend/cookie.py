@@ -15,6 +15,6 @@ def set_session_state():
 
 def set_cookies():
     controller.set("study_time", st.session_state.study_time)
-    # controller.set("short_break_time", st.session_state.short_break_time)
-    # controller.set("long_break_time", st.session_state.long_break_time)
-    # controller.set("long_break_interval", st.session_state.long_break_interval)
+    controller.set("short_break_time", st.session_state.short_break_time)
+    controller.set("long_break_time", st.session_state.long_break_time)
+    controller.set("long_break_interval", st.session_state.long_break_interval)
