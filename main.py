@@ -1,14 +1,24 @@
 import streamlit as st
 from backend.timer import remaining
+from backend.cookie import set_session_state, set_cookies
 
 st.set_page_config(page_title="FocusTutor")
 st.title("FocusTutor")
 
+set_session_state()
+
+# For testing purpose
+# if "count_for_long_break" not in st.session_state:
+#     st.session_state.count_for_long_break = 0
+# st.markdown(f"{st.session_state.count_for_long_break}")
+
 st.sidebar.markdown("# Settings")
-st.sidebar.slider("Study (min)", key="study_time", value= 25, min_value=1, max_value=120)
-st.sidebar.slider("Short Break (min)", key="short_break_time", value=5, min_value=1, max_value=15)
-st.sidebar.slider("Long Break (min)", key="long_break_time", value=15, min_value=1, max_value=30)
-st.sidebar.number_input("Long Break Interval", key="long_break_interval", value=4, min_value=0, max_value=100)
+st.sidebar.slider("Study (min)", key="study_time", min_value=1, max_value=120)
+st.sidebar.slider("Short Break (min)", key="short_break_time", min_value=1, max_value=15)
+st.sidebar.slider("Long Break (min)", key="long_break_time", min_value=1, max_value=30)
+st.sidebar.slider("Long Break Interval", key="long_break_interval", min_value=0, max_value=10)
+st.sidebar.write("0 long breaks interval means no long breaks.")
+set_cookies()
 
 if "timer_status" not in st.session_state:
     st.session_state["timer_status"] = "reset"
@@ -17,6 +27,15 @@ if "reset_flag" not in st.session_state:
 
 a, b = st.columns(2)
 with a:
+    timer_status_map = {
+        "studying": "Studying",
+        "short_break": "Short Break",
+        "long_break": "Long Break",
+    }
+    timer_status = timer_status_map.get(st.session_state["timer_status"])
+    if timer_status:
+        st.metric("Status", timer_status, border=True)
+with b:
     timer_ph = st.empty()
 
 if st.session_state["timer_status"] == "reset":
@@ -66,3 +85,20 @@ You'll need a [Muse 2](https://choosemuse.com/products/muse-2) or [Muse S](https
 Find the source code and more info on [GitHub](https://github.com/deanzahci/focustutor).
 Built by the De Anza Human-Computer Interaction team.
 """)
+
+# Hide the cookies controller iframe
+# https://github.com/NathanChen198/streamlit-cookies-controller/issues/8
+st.markdown(
+    """
+    <style>
+        .element-container:has(
+            iframe[height="0"]
+        ):has(
+            iframe[title="streamlit_cookies_controller.cookie_controller.cookie_controller"]
+        ) {
+            display: none;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
