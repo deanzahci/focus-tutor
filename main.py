@@ -1,6 +1,7 @@
 import streamlit as st
 from backend.timer import remaining
-from backend.cookie import set_session_state, set_cookies
+from backend.cookie import set_session_state, set_cookies, reset_settings, is_settings_default
+import time
 
 st.set_page_config(page_title="FocusTutor")
 st.title("FocusTutor")
@@ -19,8 +20,14 @@ st.sidebar.slider("Study (min)", key="study_time", min_value=1, max_value=120)
 st.sidebar.slider("Short Break (min)", key="short_break_time", min_value=1, max_value=15)
 st.sidebar.slider("Long Break (min)", key="long_break_time", min_value=1, max_value=30)
 st.sidebar.slider("Long Break Interval", key="long_break_interval", min_value=0, max_value=10)
-st.sidebar.write("0 long breaks interval means no long breaks.")
+if st.session_state.long_break_interval == 0:
+    st.sidebar.write("0 long breaks interval means no long breaks")
 set_cookies()
+
+if not is_settings_default():
+    if st.sidebar.button("Reset to Default", key="reset_default", use_container_width=True):
+        reset_settings()
+        st.rerun()
 
 if "timer_status" not in st.session_state:
     st.session_state["timer_status"] = "reset"
@@ -80,6 +87,12 @@ elif st.session_state["timer_status"] == "short_break":
 elif st.session_state["timer_status"] == "long_break":
     with timer_ph:
         remaining(st.session_state.long_break_time)
+
+# TODO: Implement matplotlib chart here
+
+if st.button("Start EEG Detection", key="start_eeg", use_container_width=True):
+    print("Start EEG Detection")
+    # TODO: Implement EEG detection logic here
 
 st.sidebar.markdown("""
 # Information
