@@ -1,7 +1,6 @@
 import streamlit as st
 from backend.timer import remaining
 from backend.cookie import set_session_state, set_cookies, reset_settings, is_settings_default
-import time
 
 st.set_page_config(page_title="FocusTutor")
 st.title("FocusTutor")
@@ -10,7 +9,7 @@ if "init" not in st.session_state:
     set_session_state()
     st.session_state.init = ""
 
-# For testing purpose
+# For testing purpose: if the count_for_long_break is proerly working
 # if "count_for_long_break" not in st.session_state:
 #     st.session_state.count_for_long_break = 0
 # st.markdown(f"{st.session_state.count_for_long_break}")
@@ -88,11 +87,16 @@ elif st.session_state["timer_status"] == "long_break":
     with timer_ph:
         remaining(st.session_state.long_break_time)
 
-# TODO: Implement matplotlib chart here
+graph_ph = st.empty()
 
 if st.button("Start EEG Detection", key="start_eeg", use_container_width=True):
     print("Start EEG Detection")
     # TODO: Implement EEG detection logic here
+
+    # TODO: Bring matplotlib here: generate_focus_chart()
+    # fig = generate_focus_chart()
+    # with graph_ph:
+    #     st.pyplot(fig)
 
 st.sidebar.markdown("""
 # Information
@@ -101,7 +105,7 @@ Find the source code and more info on [GitHub](https://github.com/deanzahci/focu
 Built by the De Anza Human-Computer Interaction team.
 """)
 
-# Hide the cookies controller iframe
+# Hide the cookies controller iframe; sideeffect of using streamlit-cookies-controller
 # https://github.com/NathanChen198/streamlit-cookies-controller/issues/8
 st.markdown(
     """
