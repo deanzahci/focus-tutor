@@ -1,6 +1,18 @@
 import streamtlit as st
 from pylsl import StreamInlet, resolve_streams
 
+# AF7 and AF8 are for prefrontal cortex and are better for this use case
+def get_af7_af8_data():
+    inlet = get_inlet()
+
+    try:
+        sample, timestamp = inlet.pull_sample()
+        af7, af8 = sample[1], sample[2]
+        return af7, af8, timestamp
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt")
+        return None, None, None
+
 # Function to get the LSL stream from Muse 2 via Petal Metrics
 def get_inlet():
     print("Resolving streams")
@@ -18,17 +30,6 @@ def get_inlet():
     print("Inlet created")
 
     return StreamInlet(eeg_stream)
-
-def get_af7_af8_data():
-    inlet = get_inlet()
-
-    try:
-        sample, timestamp = inlet.pull_sample()
-        af7, af8 = sample[1], sample[2]
-        return af7, af8, timestamp
-    except KeyboardInterrupt:
-        print("KeyboardInterrupt")
-        return None, None, None
 
 if __name__ == "__main__":
     inlet = get_inlet()
