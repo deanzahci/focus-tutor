@@ -1,46 +1,20 @@
-import streamlit as st
-
-@st.fragment(run_every=1)
-def remaining(study_time):
-
-    if "time_left" not in st.session_state:
-        st.session_state.time_left = 0
-    if "prev_study_time" not in st.session_state:
-        st.session_state.prev_study_time = study_time
-
-    if st.session_state.reset_flag or st.session_state.prev_study_time != study_time:
-        st.session_state.time_left = 0
-        st.session_state.prev_study_time = study_time
-        st.session_state.count_for_long_break = 0
-        st.session_state.reset_flag = False
-
-    total_seconds = study_time * 60
-    remaining_seconds = total_seconds - st.session_state.time_left
-    mins, secs = divmod(max(remaining_seconds, 0), 60)
-    st.metric("Remaining", f"{mins:02d}:{secs:02d}", border=True)
-
-    if remaining_seconds > 0:
-        st.session_state.time_left += 1
-
-    if remaining_seconds <= 0:
-        if st.session_state.timer_status == "studying":
-            if "count_for_long_break" not in st.session_state:
-                st.session_state.count_for_long_break = 0
-
-            st.session_state.count_for_long_break += 1
-
-            if st.session_state.count_for_long_break == 0:
-                st.session_state.timer_status = "short_break"
-                st.rerun()
-            elif st.session_state.count_for_long_break % st.session_state.long_break_interval == 0:
-                st.session_state.timer_status = "long_break"
-                st.rerun()
+def remaining(timer_status, long_break_interval, timer_remain_total_secs, long_interval_count):
+    if timer_remain_total_secs > 0:
+        timer_remain_total_secs -= 1
+        
+    if timer_remain_total_secs <= 0:
+        if timer_status == "Study":
+            long_interval_count += 1
+            if long_interval_count % long_break_interval == 0:
+                timer_status = "Long Break"
             else:
-                st.session_state.timer_status = "short_break"
-                st.rerun()
-        elif st.session_state.timer_status == "short_break" or st.session_state.timer_status == "long_break":
-            st.session_state.timer_status = "studying"
-            st.rerun()
+                timer_status = "Short Break"
+        elif timer_status == "Short Break" or timer_status == "Long Break":
+            timer_status = "Study"
         else:
-            if st.session_state.timer_status == "reset":
+            if timer_status == "Reset":
                 print("Error: Timer status is reset, but the timer is still running.")
+            else:
+                print("Error: Timer status is not recognized.")
+    
+    return timer_status, timer_remain_total_secs, long_interval_count

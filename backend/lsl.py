@@ -1,38 +1,53 @@
-import streamtlit as st
 from pylsl import StreamInlet, resolve_streams
+import numpy as np
 
-# AF7 and AF8 are for prefrontal cortex and are better for this use case
-def get_af7_af8_data():
-    inlet = get_inlet()
+_inlet = None # Global inlet cache
 
-    try:
-        sample, timestamp = inlet.pull_sample()
-        af7, af8 = sample[1], sample[2]
-        return af7, af8, timestamp
-    except KeyboardInterrupt:
-        print("KeyboardInterrupt")
-        return None, None, None
-
-# Function to get the LSL stream from Muse 2 via Petal Metrics
+'''
+get the inlet from the stream
+'''
 def get_inlet():
-    print("Resolving streams")
-    streams = resolve_streams(wait_time=1)
-    eeg_stream = None
+    global _inlet
+    if _inlet is None:
+        print("Resolving streams")
+        streams = resolve_streams(wait_time=1)
+        eeg_stream = None
 
-    for stream in streams:
-        if stream.name() == 'PetalStream_eeg':
-            eeg_stream = stream
-            break
+        for stream in streams:
+            if stream.name() == 'PetalStream_eeg':
+                eeg_stream = stream
+                break
 
-    if eeg_stream is None:
-        st.error("Stream not found")
-        exit(1)
-    print("Inlet created")
+        if eeg_stream is None:
+            print("No EEG stream found")
+            exit(1)
 
-    return StreamInlet(eeg_stream)
+        print("Inlet created")
+        _inlet = StreamInlet(eeg_stream)
 
-if __name__ == "__main__":
+    return _inlet
+
+'''
+get average of af7 and af8 channels
+'''
+def get_raw_eeg(duration_sec=10, fs=256):
     inlet = get_inlet()
-    while True:
-        sample, timestamp = inlet.pull_sample()
-        print(sample, timestamp)
+    n_samples = int(duration_sec * fs)
+    data = []
+    
+    for _ in range(n_samples):
+        try:
+            sample, timestamp = inlet.pull_sample(timeout=0.1)
+            if sample is not None:
+                af7 = sample[1]
+                af8 = sample[2]
+                average = (af7 + af8) / 2
+                data.append(average)
+        except Exception as e:
+            print(f"Error pulling sample: {e}")
+    
+    if not data:
+        print("Warning: No LSL data received, returning random data")
+        pass
+        
+    return np.array(data)
